@@ -416,7 +416,7 @@ function App() {
   const handleSelectRecipientUser = async (recipient) => {
     setRecipientEmail(recipient.email);
     setSuggestions([]);
-    
+
     // Fetch recipient wallets to find one matching activeWallet currency
     try {
       // In a real app, we query recipient wallets.
@@ -455,7 +455,7 @@ function App() {
     return (
       <div className="auth-container">
         <div className="auth-card">
-          <div className="auth-logo">Antigravity Wallet</div>
+          <div className="auth-logo">Thor Wallet</div>
           <div className="auth-subtitle">High Performance Fintech Ledger</div>
 
           <form onSubmit={isRegistering ? handleRegister : handleLogin}>
@@ -532,7 +532,7 @@ function App() {
       {/* Header */}
       <header className="app-header">
         <div className="header-brand" onClick={() => setActiveTab('dashboard')}>
-          Antigravity Wallet
+          Thor Wallet
         </div>
         <div className="header-menu">
           <button
