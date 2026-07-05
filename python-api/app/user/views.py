@@ -45,3 +45,11 @@ class UserListView(generics.ListAPIView):
     def get_queryset(self):
         # Return all users except the currently authenticated user
         return User.objects.exclude(id=self.request.user.id).order_by('email')
+
+
+from django.http import JsonResponse
+from django.views import View
+
+class HealthView(View):
+    def get(self, request, *args, **kwargs):
+        return JsonResponse({"status": "healthy"})

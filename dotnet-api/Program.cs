@@ -31,7 +31,14 @@ if (slashIndex != -1)
 {
     redisUrl = redisUrl[..slashIndex];
 }
-builder.Services.AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer.Connect(redisUrl));
+var redisConfig = new ConfigurationOptions
+{
+    EndPoints = { redisUrl },
+    AbortOnConnectFail = false,
+    ConnectRetry = 5,
+    ConnectTimeout = 5000
+};
+builder.Services.AddSingleton<IConnectionMultiplexer>(sp => ConnectionMultiplexer.Connect(redisConfig));
 
 // 3. Register Custom Services
 builder.Services.AddScoped<IWalletService, WalletService>();
