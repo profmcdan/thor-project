@@ -113,14 +113,18 @@ To simulate intense financial traffic and verify the row locking, transaction sa
 
 ### Running the Simulator
 
-1. Install the required dependencies (or use `uv`):
-   ```bash
-   pip install requests
-   ```
-2. Execute the simulator:
-   ```bash
-   python simulate_traffic.py
-   ```
+Execute the simulator directly using `uv` (which automatically handles downloading and caching the inline `requests` dependency):
+
+```bash
+uv run simulate_traffic.py
+```
+
+Alternatively, if you're using a standard Python environment, install `requests` first:
+
+```bash
+pip install requests
+python simulate_traffic.py
+```
 
 ### What the Simulator Does:
 1. **Checks API Health**: Waits until the Nginx balancer and Django containers are fully online.
