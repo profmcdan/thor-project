@@ -37,7 +37,7 @@ services:
       - "6432:5432"
 
   db-migrate:
-    build: .
+    build: ./python-api
     container_name: wallet_db_migrate
     command: python manage.py migrate --noinput
     env_file:
@@ -47,7 +47,7 @@ services:
         condition: service_healthy
 
   api:
-    build: .
+    build: ./python-api
     restart: always
     command: web
     expose:
@@ -85,7 +85,7 @@ services:
         condition: service_healthy
 
   celery:
-    build: .
+    build: ./python-api
     restart: always
     command: celery
     env_file:
@@ -104,7 +104,7 @@ services:
         condition: service_completed_successfully
 
   celery-beat:
-    build: .
+    build: ./python-api
     restart: always
     command: celery-beat
     env_file:
@@ -121,6 +121,45 @@ services:
         condition: service_started
       db-migrate:
         condition: service_completed_successfully
+
+  dotnet-api:
+    build:
+      context: ./dotnet-api
+      dockerfile: Dockerfile
+    restart: always
+    expose:
+      - "8000"
+    scale: 4
+    env_file:
+      - .env
+    environment:
+      - POSTGRES_HOST=pgbouncer
+      - POSTGRES_PORT=5432
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      pgbouncer:
+        condition: service_started
+      db-migrate:
+        condition: service_completed_successfully
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8000/docs || exit 1"]
+      interval: 3s
+      timeout: 3s
+      retries: 5
+
+  nginx-dotnet:
+    image: nginx:alpine
+    restart: always
+    ports:
+      - "8006:80"
+    volumes:
+      - ./nginx-dotnet.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      dotnet-api:
+        condition: service_healthy
 
   frontend:
     build:

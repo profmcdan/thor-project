@@ -252,3 +252,25 @@ if discrepancy == Decimal("0.0000"):
     print("\n[SUCCESS] Balance reconciliation matched perfectly! The database row locking and ledger transactions successfully prevented double spending or balance loss.")
 else:
     print("\n[FAILURE] Balance mismatch found! Double spending or transaction leak occurred.")
+
+# Save report to JSON file if environment variable is set
+report_file = os.environ.get("TRAFFIC_SIM_REPORT_FILE")
+if report_file:
+    import json
+    report_data = {
+        "elapsed_time": round(elapsed, 4),
+        "throughput": round(stats['total_requests'] / elapsed, 2),
+        "total_requests": stats['total_requests'],
+        "success": stats['success'],
+        "idempotent_hits": stats['idempotent_hits'],
+        "insufficient_funds": stats['insufficient_funds'],
+        "concurrency_conflicts": stats['concurrency_conflicts'],
+        "errors": stats['errors'],
+        "reconciliation_expected": str(expected_total),
+        "reconciliation_actual": str(total_final_balance),
+        "reconciliation_discrepancy": str(discrepancy)
+    }
+    with open(report_file, "w") as f:
+        json.dump(report_data, f, indent=4)
+    print(f"\nStats report successfully saved to {report_file}")
+

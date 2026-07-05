@@ -1,10 +1,95 @@
-# Python-generated files
+# ==========================================
+# Python Standard Ignores
+# ==========================================
+# Byte-compiled / optimized / DLL files
 __pycache__/
-*.py[oc]
-build/
-dist/
-wheels/
-*.egg-info
+*.py[cod]
+*$py.class
 
-# Virtual environments
-.venv
+# Distribution / packaging
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual Environments
+.venv/
+venv/
+ENV/
+env/
+.env
+
+# Testing / coverage
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.log
+.hypothesis/
+.pytest_cache/
+.parity
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# ==========================================
+# .NET / C# Standard Ignores
+# ==========================================
+# Build folders
+bin/
+obj/
+[Db]in/
+[Ob]j/
+[Dd]ebug/
+[Rr]elease/
+
+# MSBuild / Visual Studio / Rider / VS Code cache & configuration
+.vs/
+.idea/
+*.user
+*.userosscache
+*.suo
+*.sln.docstates
+*.userprefs
+*.lock.json
+.ionide/
+*.csproj.user
+
+# Publish / output directories
+publish/
+out/
+dist-dotnet/
+
+# ==========================================
+# Frontend (Node / Vite) Ignores
+# ==========================================
+node_modules/
+frontend/node_modules/
+frontend/dist/
+.eslintcache
+.parcel-cache
+
+# ==========================================
+# Thor Project / Benchmark Specific Ignores
+# ==========================================
+django_report.json
+dotnet_report.json
+benchmark_report.pdf
+postgres_data/
