@@ -57,7 +57,7 @@ def register_user(i):
             "password": password,
             "first_name": f"User_{i}",
             "last_name": "Simulator"
-        }, timeout=5)
+        }, timeout=30)
         
         if reg_resp.status_code != 201:
             print(f"Failed to register user {i}: {reg_resp.text}")
@@ -72,7 +72,7 @@ def register_user(i):
         wallet_resp = session.post(f"{API_URL}/wallets/", json={
             "name": "Primary Wallet",
             "currency": "NGN"
-        }, headers=headers, timeout=5)
+        }, headers=headers, timeout=30)
         
         if wallet_resp.status_code != 201:
             print(f"Failed to create wallet for user {i}: {wallet_resp.text}")
@@ -92,7 +92,7 @@ def register_user(i):
                 **headers,
                 "X-Idempotency-Key": str(uuid.uuid4())
             },
-            timeout=5
+            timeout=30
         )
         
         if dep_resp.status_code != 201:
@@ -178,7 +178,7 @@ def perform_random_transfer(index):
                 f"{API_URL}/transactions/transfer/",
                 json=payload,
                 headers=req_headers,
-                timeout=10
+                timeout=30
             )
             
             if resp.status_code == 201:
@@ -230,7 +230,7 @@ total_final_balance = Decimal("0.0000")
 for user in users:
     headers = {"Authorization": f"Bearer {user['token']}"}
     try:
-        resp = session.get(f"{API_URL}/wallets/{user['wallet_id']}/", headers=headers, timeout=5)
+        resp = session.get(f"{API_URL}/wallets/{user['wallet_id']}/", headers=headers, timeout=15)
         if resp.status_code == 200:
             bal = Decimal(resp.json()["balance"])
             total_final_balance += bal
