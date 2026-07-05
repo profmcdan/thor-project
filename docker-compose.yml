@@ -12,7 +12,7 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d wallet_db"]
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -36,6 +36,16 @@ services:
     ports:
       - "6432:5432"
 
+  db-migrate:
+    build: .
+    container_name: wallet_db_migrate
+    command: python manage.py migrate --noinput
+    env_file:
+      - .env
+    depends_on:
+      db:
+        condition: service_healthy
+
   web:
     build: .
     restart: always
@@ -55,6 +65,8 @@ services:
         condition: service_healthy
       pgbouncer:
         condition: service_started
+      db-migrate:
+        condition: service_completed_successfully
 
   nginx:
     image: nginx:alpine
@@ -84,6 +96,8 @@ services:
         condition: service_healthy
       pgbouncer:
         condition: service_started
+      db-migrate:
+        condition: service_completed_successfully
 
   celery-beat:
     build: .
@@ -102,6 +116,8 @@ services:
         condition: service_healthy
       pgbouncer:
         condition: service_started
+      db-migrate:
+        condition: service_completed_successfully
 
   frontend:
     build:
@@ -113,8 +129,8 @@ services:
       - "5173:5173"
     env_file:
       - .env
-    depends_on:
-      - nginx
+    # depends_on:
+    #   - nginx
 
 volumes:
   postgres_data:
