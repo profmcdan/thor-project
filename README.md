@@ -100,8 +100,8 @@ This starts:
 2. **`db-migrate`**: Runs Django database migrations once at startup and exits cleanly.
 3. **`pgbouncer`**: PgBouncer connection pooler listening on port `6432`.
 4. **`redis`**: Redis server acting as the Celery broker/result backend.
-5. **`web`**: 4 replicas of the Django REST framework backend.
-6. **`nginx`**: Load balancer mapping port `8005` to the web replicas.
+5. **`api`**: 4 replicas of the Django REST framework backend.
+6. **`nginx`**: Load balancer mapping port `8005` to the api replicas.
 7. **`celery`** & **`celery-beat`**: Background task worker and scheduler.
 8. **`frontend`**: React Vite application running on port `5173`.
 
@@ -146,5 +146,5 @@ Reconciliation Summary:
 To run the Django test suite:
 
 ```bash
-docker compose exec web python manage.py test
+docker compose exec api python manage.py test
 ```
