@@ -1,0 +1,120 @@
+services:
+  db:
+    image: postgres:18
+    container_name: wallet_db_postgres
+    restart: always
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${MAIN_POSTGRES_PASSWORD}
+    ports:
+      - "5435:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d wallet_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:alpine
+    container_name: wallet_redis
+    restart: always
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  pgbouncer:
+    image: edoburu/pgbouncer:latest
+    container_name: wallet_pgbouncer
+    restart: always
+    volumes:
+      - ./pgbouncer:/etc/pgbouncer:ro
+    ports:
+      - "6432:5432"
+
+  web:
+    build: .
+    restart: always
+    command: web
+    expose:
+      - "8000"
+    scale: 4
+    env_file:
+      - .env
+    environment:
+      - PGBOUNCER_HOST=pgbouncer
+      - PGBOUNCER_PORT=5432
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      pgbouncer:
+        condition: service_started
+
+  nginx:
+    image: nginx:alpine
+    container_name: wallet_nginx_lb
+    restart: always
+    ports:
+      - "8005:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - web
+
+  celery:
+    build: .
+    container_name: wallet_celery_worker
+    restart: always
+    command: celery
+    env_file:
+      - .env
+    environment:
+      - PGBOUNCER_HOST=pgbouncer
+      - PGBOUNCER_PORT=5432
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      pgbouncer:
+        condition: service_started
+
+  celery-beat:
+    build: .
+    container_name: wallet_celery_beat
+    restart: always
+    command: celery-beat
+    env_file:
+      - .env
+    environment:
+      - PGBOUNCER_HOST=pgbouncer
+      - PGBOUNCER_PORT=5432
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      pgbouncer:
+        condition: service_started
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: wallet_frontend_react
+    restart: always
+    ports:
+      - "5173:5173"
+    env_file:
+      - .env
+    depends_on:
+      - nginx
+
+volumes:
+  postgres_data:
